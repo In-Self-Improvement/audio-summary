@@ -1,0 +1,110 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Hooks Convention Guidelines
+
+## Rule Type: Development Workflow
+
+### Purpose
+Define clear patterns for custom hooks that manage state, business logic, and UI connections while maintaining separation from API and service layers.
+
+### Hook Responsibilities
+
+#### Core Responsibilities
+- **State management**: Component-level state (loading, error, data, etc.)
+- **Business logic**: Domain-specific processing logic, service/API calls
+- **UI connection**: Provide interface ready for direct component usage
+
+#### Hook vs Service Separation
+- **Hook**: React state + business logic + lifecycle
+- **Service**: Pure business logic (React-independent processing)
+
+### Hook Structure Pattern
+
+#### File Organization
+```
+features/{domain}/
+├── hooks/
+│   ├── use{Domain}.ts          # Main domain state/logic
+│   └── use{SpecificAction}.ts  # Specific action logic
+├── services/
+│   └── {domain}Service.ts      # Pure business logic
+```
+
+#### Implementation Pattern
+```tsx
+// features/auth/hooks/useAuth.ts
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import authService from '@/features/auth/services/authService';
+import { LoginCredentials } from '@/features/auth/types/authType';
+
+const useAuth = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const login = async (credentials: LoginCredentials) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await authService.login(credentials);
+      router.push('/edu');
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = () => {
+    authService.logout();
+    router.push('/login');
+  };
+
+  return {
+    login,
+    logout,
+    isLoggedIn: authService.isLoggedIn(),
+    isLoading,
+    error,
+  };
+};
+
+export default useAuth;
+```
+
+### Naming Rules
+
+#### Hook Naming
+- **use + Action pattern**: `useAuth`, `useUser`, `useModal`
+- **Single responsibility**: Each hook focuses on one domain or feature
+- **Return object**: Return object with necessary state and functions
+
+#### Return Pattern
+```tsx
+// ✅ Good: Object with clear property names
+return {
+  data: user,
+  isLoading,
+  error,
+  refetch,
+  update: updateUser,
+};
+
+// ❌ Avoid: Array returns (harder to understand)
+return [user, isLoading, updateUser];
+```
+
+### Additional Settings
+- **Default export**: Use default export for single hook per file
+- **State consistency**: Use consistent loading/error state patterns
+- **Error handling**: Leverage service layer for business logic errors
+- **React integration**: Keep React-specific logic in hooks, pure logic in services
+
+### Future Considerations
+- React Query integration may be added later
+- Current pattern should remain compatible with future data fetching libraries

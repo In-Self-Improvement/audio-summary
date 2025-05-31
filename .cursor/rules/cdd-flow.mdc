@@ -1,0 +1,157 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Component-Driven Development (CDD) Guidelines
+
+## Rule Type: Development Workflow
+
+### Purpose
+Encourage building meaningful, reusable components first, then documenting them with Storybook, and finally composing them into larger UIs. This approach promotes better component isolation, documentation, and reusability without enforcing strict atomic design principles.
+
+### Core Principles
+
+#### 1. Component-First Development
+- When building a new feature or UI element, start by creating a standalone component
+- Focus on building components that are meaningful for your domain/feature
+- **Do not** force yourself to start with tiny atomic elements (like basic Button/Input) unless they're genuinely reusable across multiple places
+- Build components at a level that makes sense for your current needs
+
+#### 2. Required Component Structure
+Each component should follow this structure:
+```
+features/{domain}/components/{ComponentName}/
+├── {ComponentName}.view.tsx      # Presentational component (required)
+├── {ComponentName}.tsx           # Container with logic (only if needed)
+├── {ComponentName}.module.css    # Component styles (required)
+└── {ComponentName}.stories.tsx   # Storybook documentation (strongly recommended)
+```
+
+#### 3. Documentation with Storybook
+- Create a `.stories.tsx` file for each component you build
+- This helps you:
+  - Test the component in isolation
+  - Document different states and variants
+  - Share components with team members
+  - Catch edge cases early
+- **Exception**: You may skip stories for throwaway/experimental components, but add them once the component becomes stable
+
+#### 4. Composition Over Complexity
+- After building individual components, compose them in:
+  - `screens/` for full page layouts
+  - Higher-level container components
+  - Other feature components
+- Prefer composition over making single components overly complex
+
+### Development Flow
+
+#### Step 1: Build Component
+```tsx
+// Example: features/user/components/UserProfileCard/UserProfileCard.view.tsx
+interface UserProfileCardProps {
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+export function UserProfileCardView({ name, email, avatar }: UserProfileCardProps) {
+  return (
+    <div className={styles.card}>
+      {avatar && <img src={avatar} alt={`${name}'s avatar`} />}
+      <h3>{name}</h3>
+      <p>{email}</p>
+    </div>
+  );
+}
+```
+
+#### Step 2: Create Stories
+```tsx
+// UserProfileCard.stories.tsx
+export default {
+  title: 'User/UserProfileCard',
+  component: UserProfileCardView,
+};
+
+export const Default = {
+  args: {
+    name: 'John Doe',
+    email: 'john@example.com',
+  },
+};
+
+export const WithAvatar = {
+  args: {
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    avatar: '/avatar.jpg',
+  },
+};
+```
+
+#### Step 3: Add Logic if Needed
+```tsx
+// UserProfileCard.tsx (only if state/logic is needed)
+import { UserProfileCardView } from './UserProfileCard.view';
+
+export function UserProfileCard({ userId }: { userId: string }) {
+  const { data: user } = useUser(userId);
+  
+  if (!user) return <div>Loading...</div>;
+  
+  return <UserProfileCardView {...user} />;
+}
+```
+
+#### Step 4: Compose in Screens
+```tsx
+// features/user/screens/UserProfileScreen.tsx
+import { UserProfileCard } from '../components/UserProfileCard/UserProfileCard';
+
+export function UserProfileScreen() {
+  return (
+    <div>
+      <UserProfileCard userId="123" />
+      {/* Other composed components */}
+    </div>
+  );
+}
+```
+
+### Guidelines (Not Strict Rules)
+
+#### ✅ Recommended
+- Build components that solve real feature needs
+- Create stories for components you plan to reuse
+- Start with the component, then think about composition
+- Keep components focused on a single responsibility
+
+#### ⚠️ Flexible
+- You don't need to create stories for every single component immediately
+- You can refactor existing code into components gradually
+- Component granularity should match your feature needs, not abstract design systems
+
+#### ❌ Avoid
+- Building components so atomic that they're not useful (unless genuinely reusable)
+- Skipping component isolation entirely
+- Creating overly complex components that should be composed of smaller parts
+
+### Integration with Existing Rules
+
+This CDD approach works alongside:
+- **Folder Structure Rules**: Components go in the designated `components/` folders
+- **Frontend Conventions**: Follow naming, coupling, and cohesion principles
+- **Testing**: Each component can be tested in isolation
+
+### Benefits
+
+1. **Isolation**: Components work independently, easier to test and debug
+2. **Documentation**: Storybook provides living documentation
+3. **Reusability**: Well-built components can be reused across features
+4. **Collaboration**: Team members can see and use existing components
+5. **Quality**: Building in isolation often leads to better component design
+
+---
+
+**Remember**: This is a guideline to encourage good practices, not a rigid system. Adapt it to your team's needs and project requirements.

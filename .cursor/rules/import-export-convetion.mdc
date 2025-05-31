@@ -1,0 +1,58 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Import/Export Convention Guidelines
+
+## Rule Type: Development Workflow
+
+### Purpose
+Establish consistent import/export patterns across the codebase to improve readability, maintainability, and prevent path-related issues.
+
+### Import Rules
+
+#### Path Usage Rules
+- **Alias paths required**: Always use `@/features/...`, `@/shared/...`
+- **Absolute paths forbidden**: Never use `src/features/...`
+- **Relative paths**: Only within the same component folder (`./UserCard.view`, `./styles.module.css`)
+- **Cross-domain navigation**: Always use absolute alias paths (`@/features/user/services/...`)
+
+#### Example
+```tsx
+// ✅ Correct: Alias paths for cross-domain imports
+import api from '@/shared/lib/axios';
+import { UserInfoResponse } from '@/features/user/types/userType';
+import authService from '@/features/auth/services/authService';
+import { validateUser } from '@/features/user/services/userValidation';
+
+// ✅ Correct: Relative paths only within same component folder
+import { UserCardView } from './UserCard.view';
+import styles from './UserProfile.module.css';
+
+// ❌ Wrong: Absolute path without alias
+import api from 'src/shared/lib/axios';
+```
+
+### Export Rules
+
+#### Single Export (use default export)
+```tsx
+const UserProfile = ({ userId }: { userId: string }) => {
+  // ...
+};
+export default UserProfile;
+```
+
+#### Multiple Exports (use named exports)
+```tsx
+export const UserCard = ({ user }: { user: User }) => { ... };
+export const UserList = ({ users }: { users: User[] }) => { ... };
+export const USER_CONSTANTS = { ... };
+```
+
+### Additional Settings
+- ESLint rule enforces default export for single exports
+- Prettier handles import ordering automatically
+- Focus on consistent alias usage rather than import order
+

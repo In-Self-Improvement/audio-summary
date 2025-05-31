@@ -1,0 +1,78 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# API Convention Guidelines
+
+## Rule Type: Development Workflow
+
+### Purpose
+Standardize API function structure, naming, and organization using the existing axios-based architecture.
+
+### API Function Structure
+
+#### File Organization
+```
+features/{domain}/
+├── api/
+│   └── {domain}Api.ts      # External API communication functions
+├── types/
+│   └── {domain}Type.ts     # API request/response type definitions
+```
+
+#### Function Pattern
+```tsx
+// features/user/api/userApi.ts
+import api from '@/shared/lib/axios';
+import { UserInfoResponse, UpdateUserRequest } from '@/features/user/types/userType';
+
+const getUserInfo = async (): Promise<{ data: UserInfoResponse }> => {
+  const response = await api.get<void, { data: UserInfoResponse }>(
+    '/v1/member/getTokeninfo'
+  );
+  return response;
+};
+
+const updateUser = async (userId: string, data: UpdateUserRequest): Promise<{ data: UserInfoResponse }> => {
+  const response = await api.put<UpdateUserRequest, { data: UserInfoResponse }>(
+    `/v1/member/${userId}`,
+    data
+  );
+  return response;
+};
+
+const deleteUser = async (userId: string): Promise<void> => {
+  await api.delete<void, void>(`/v1/member/${userId}`);
+};
+
+const userApi = {
+  getUserInfo,
+  updateUser,
+  deleteUser,
+};
+
+export default userApi;
+```
+
+### Naming Rules
+
+#### Function Naming
+- **Verb + Noun pattern**: `getUserInfo`, `updateUser`, `deleteUser`, `createUser`
+- **RESTful style**: Use appropriate verbs for HTTP methods
+- **Consistent response types**: `Promise<{ data: ResponseType }>` or `Promise<void>`
+
+#### API Object Naming
+- **Domain + Api suffix**: `userApi`, `authApi`, `productApi`
+- **Default export**: Always use default export for API objects
+
+### Response Handling
+- **Consistent structure**: All responses follow `{ data: T }` pattern
+- **Error handling**: Managed centrally by axios interceptors
+- **Type safety**: Use TypeScript generics for request/response types
+
+### Additional Settings
+- Error handling and Sentry logging handled by shared axios instance
+- No additional error handling needed at component level
+- Focus on consistent function naming and structure
+

@@ -1,0 +1,148 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Types Convention Guidelines
+
+## Rule Type: Development Workflow
+
+### Purpose
+Establish consistent TypeScript type management patterns using co-location principle, ensuring types are defined close to where they're used while maintaining clear separation between `type` and `interface` usage.
+
+### Co-location Principle
+
+#### File Structure
+```
+features/{domain}/
+├── components/
+│   └── UserCard/
+│       ├── UserCard.view.tsx
+│       ├── UserCard.tsx
+│       ├── UserCard.types.ts        # Component-specific types
+│       └── UserCard.module.css
+├── types/
+│   └── {domain}Type.ts              # Shared domain types only
+├── api/
+├── hooks/
+└── services/
+```
+
+#### Type Definition Locations
+- **Component-specific types**: Define in same folder as component (`ComponentName.types.ts`)
+- **Shared domain types**: Define in `features/{domain}/types/{domain}Type.ts`
+- **Global/shared types**: Define in `shared/types/`
+
+### Type vs Interface Usage
+
+#### Use `type` for:
+- **Union types**: `type Status = 'loading' | 'success' | 'error'`
+- **Tuple types**: `type Coordinates = [number, number]`
+- **Function types**: `type EventHandler = (event: Event) => void`
+- **Complex computed types**: `type UserKeys = keyof User`
+
+#### Use `interface` for:
+- **Object structures**: `interface User { id: string; name: string; }`
+- **React component props**: `interface ButtonProps { children: React.ReactNode; }`
+- **Extensible structures**: `interface AdminUser extends User { permissions: string[]; }`
+- **API response/request shapes**: `interface LoginResponse { token: string; user: User; }`
+
+### Naming Conventions
+
+#### Component Props
+```tsx
+// Component props: {ComponentName}Props
+interface UserCardProps {
+  user: User;
+  onEdit?: () => void;
+}
+
+// Component state/internal types: {ComponentName}{Purpose}
+type UserCardState = 'idle' | 'editing' | 'saving';
+interface UserCardFormData {
+  name: string;
+  email: string;
+}
+```
+
+#### Domain Types
+```tsx
+// API types: {Domain}{Purpose}
+interface UserResponse {
+  data: User;
+  meta: ResponseMeta;
+}
+
+interface CreateUserRequest {
+  name: string;
+  email: string;
+}
+
+// Domain entities: {EntityName}
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+```
+
+### Import Patterns
+
+#### Relative Imports (same folder only)
+```tsx
+// Within same folder - use relative imports
+import { UserCardProps } from './UserCard.types';
+import styles from './UserCard.module.css';
+```
+
+#### Absolute Imports (cross-folder/domain)
+```tsx
+// Cross-domain or different folders - use alias paths
+import { User } from '@/features/user/types/userType';
+import { ApiResponse } from '@/shared/types/common';
+import { validateEmail } from '@/shared/utils/validation';
+```
+
+### File Naming Conventions
+
+#### Component Types Files
+- `{ComponentName}.types.ts` - Component-specific types
+- Use PascalCase for component names, camelCase for file extension
+
+#### Domain Types Files
+- `{domain}Type.ts` - Shared domain types (e.g., `userType.ts`, `authType.ts`)
+- Use camelCase for domain name, PascalCase for Type suffix
+
+### Export Patterns
+
+#### Single Export (use default export)
+```tsx
+// For main domain entity
+interface User {
+  id: string;
+  name: string;
+}
+export default User;
+```
+
+#### Multiple Exports (use named exports)
+```tsx
+// For multiple related types
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+}
+
+export interface UpdateUserRequest {
+  name?: string;
+  email?: string;
+}
+
+export type UserStatus = 'active' | 'inactive' | 'pending';
+```
+
+### Additional Settings
+- **Consistent location**: Types should be predictable and easy to find
+- **Avoid type pollution**: Don't export types that are only used internally
+- **Documentation**: Add JSDoc comments for complex or business-critical types
+- **Generic naming**: Use descriptive names that reflect the data structure or purpose

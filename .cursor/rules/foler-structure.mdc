@@ -1,0 +1,113 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## 📁 Folder & File Structure Rules for Cursor
+
+### Rule Type: Directory & File Structure
+
+#### 1. Top-level Structure
+
+- The following directories **must** exist under `src/`:
+  - `app/` (Next.js app router, routing only)
+  - `features/` (domain-driven feature folders)
+  - `shared/` (shared UI, layout, utils, config)
+  - `assets/` (images, fonts, icons)
+  - `styles/` (global CSS variables)
+  - `instrumentation.ts` (monitoring/logging)
+
+#### 2. Features Directory Structure
+
+- Each domain under `features/` **must** have:
+  - `components/` (domain UI components)
+    - Each component in its own folder:  
+      `{ComponentName}/`
+      - `{ComponentName}.view.tsx` (presentational component, style & structure only)
+      - `{ComponentName}.tsx` (container with state/logic, only if needed)
+      - `{ComponentName}.module.css` (component-scoped styles)
+      - `{ComponentName}.stories.tsx` (storybook documentation)
+  - `api/` (external API request functions, server communication only)
+  - `types/` (TypeScript types/interfaces)
+  - `hooks/` (custom React hooks: state management, API wrapping, UI connection)
+  - `services/` (pure domain functions, core logic, data transformation)
+  - `screens/` (full-page components for routing entry)
+
+#### 3. Shared Directory Structure
+
+- `shared/ui/` (reusable UI components, same structure as domain components)
+- `shared/layout/` (common layout components)
+- `shared/lib/` (utility functions, axios, etc.)
+- `shared/config/` (global config/constants)
+
+#### 4. App Directory Structure
+
+- Each route under `app/` **must** have a `page.tsx` (routing & SSR/CSR only)
+- Business UI logic **must** be imported from `features/*/screens/`
+
+#### 5. Naming Rules
+
+| File/Folder Name         | Description                                              |
+|------------------------- |---------------------------------------------------------|
+| `*.view.tsx`             | Pure presentational component (style + structure only)  |
+| `*.tsx`                  | Container component (with state/logic, wraps .view.tsx) |
+| `*.stories.tsx`          | Storybook documentation                                 |
+| `*.module.css`           | Component-scoped CSS                                    |
+| `/screens/`              | Full-page components (routing entry, state + composition)|
+| `/api/`                  | API request functions (server communication only)       |
+| `/types/`                | TypeScript types/interfaces                             |
+| `/hooks/`                | Custom React hooks (state, API wrapping, UI connection) |
+| `/services/`             | Pure domain functions, core logic, data transformation  |
+
+#### 6. Additional Settings
+
+- **No unnecessary folder depth**: Prefer meaningful, shallow structure over deep nesting.
+- **Consistent naming**: All files and folders must use camelCase or PascalCase as appropriate.
+- **No logic in app/page.tsx**: Only routing/SSR/CSR logic allowed.
+- **Unit conventions**:  
+  - Font/line-height: `rem`  
+  - Padding/margin/gap: `px`  
+  - Width/height: `%`, `px`  
+  - Icon size: `px`  
+  - Responsive values: `clamp()`, `px`  
+  - Media query: `px`
+
+#### 7. Example Structure
+
+```plaintext
+src/
+├── app/
+│   └── edu/
+│       └── page.tsx
+├── features/
+│   └── user/
+│       ├── components/
+│       │   └── UserProfileCard/
+│       │       ├── UserProfileCard.view.tsx
+│       │       ├── UserProfileCard.tsx
+│       │       ├── UserProfileCard.module.css
+│       │       └── UserProfileCard.stories.tsx
+│       ├── api/
+│       ├── types/
+│       ├── hooks/
+│       ├── services/
+│       └── screens/
+│           └── UserProfileScreen.tsx
+├── shared/
+│   ├── ui/
+│   ├── layout/
+│   ├── lib/
+│   └── config/
+├── assets/
+├── styles/
+└── instrumentation.ts
+```
+
+---
+
+### Rule Type: Lint/Validation
+- **Warn** if any business logic is found in `app/{route}/page.tsx`.
+- **Warn** if a component with state/logic does not have a `.tsx` container.
+- **Warn** if presentational components contain state or side effects.
+- **Warn** if any folder/file does not follow the naming conventions above.
+- **Warn** if any domain folder is missing one of: `api/`, `types/`, `hooks/`, `services/`, `components/`, `screens/`.
