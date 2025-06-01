@@ -1,3 +1,5 @@
-export default function Home() {
-  return <div></div>;
+import { AudioRecorderScreen } from "@/features/audio/screens/AudioRecorderScreen";
+
+export default function HomePage() {
+  return <AudioRecorderScreen />;
 }
