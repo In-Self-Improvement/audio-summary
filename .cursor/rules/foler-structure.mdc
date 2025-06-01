@@ -23,9 +23,8 @@ alwaysApply: true
   - `components/` (domain UI components)
     - Each component in its own folder:  
       `{ComponentName}/`
-      - `{ComponentName}.view.tsx` (presentational component, style & structure only)
+      - `{ComponentName}.view.tsx` (presentational component, style & structure only, uses Tailwind CSS)
       - `{ComponentName}.tsx` (container with state/logic, only if needed)
-      - `{ComponentName}.module.css` (component-scoped styles)
       - `{ComponentName}.stories.tsx` (storybook documentation)
   - `api/` (external API request functions, server communication only)
   - `types/` (TypeScript types/interfaces)
@@ -49,30 +48,37 @@ alwaysApply: true
 
 | File/Folder Name         | Description                                              |
 |------------------------- |---------------------------------------------------------|
-| `*.view.tsx`             | Pure presentational component (style + structure only)  |
+| `*.view.tsx`             | Pure presentational component (style with Tailwind CSS) |
 | `*.tsx`                  | Container component (with state/logic, wraps .view.tsx) |
 | `*.stories.tsx`          | Storybook documentation                                 |
-| `*.module.css`           | Component-scoped CSS                                    |
 | `/screens/`              | Full-page components (routing entry, state + composition)|
 | `/api/`                  | API request functions (server communication only)       |
 | `/types/`                | TypeScript types/interfaces                             |
 | `/hooks/`                | Custom React hooks (state, API wrapping, UI connection) |
 | `/services/`             | Pure domain functions, core logic, data transformation  |
 
-#### 6. Additional Settings
+#### 6. Styling Guidelines
+
+- **Use Tailwind CSS**: All styling should be done with Tailwind utility classes
+- **shadcn/ui components**: Preferred for complex UI components (Button, Card, Input, etc.)
+- **Custom CSS**: Only when Tailwind utilities are insufficient (animations, complex gradients)
+- **Global styles**: Only in `styles/globals.css` for CSS variables and base styles
+- **Responsive design**: Use Tailwind's responsive prefixes (sm:, md:, lg:, xl:, 2xl:)
+
+#### 7. Additional Settings
 
 - **No unnecessary folder depth**: Prefer meaningful, shallow structure over deep nesting.
 - **Consistent naming**: All files and folders must use camelCase or PascalCase as appropriate.
 - **No logic in app/page.tsx**: Only routing/SSR/CSR logic allowed.
 - **Unit conventions**:  
-  - Font/line-height: `rem`  
-  - Padding/margin/gap: `px`  
-  - Width/height: `%`, `px`  
-  - Icon size: `px`  
-  - Responsive values: `clamp()`, `px`  
-  - Media query: `px`
+  - Font/line-height: Tailwind text utilities  
+  - Padding/margin/gap: Tailwind spacing utilities
+  - Width/height: Tailwind sizing utilities
+  - Colors: Tailwind color palette or CSS variables
+  - Responsive values: Tailwind responsive prefixes
+  - Animations: Tailwind animate utilities or custom CSS
 
-#### 7. Example Structure
+#### 8. Example Structure
 
 ```plaintext
 src/
@@ -83,9 +89,8 @@ src/
 │   └── user/
 │       ├── components/
 │       │   └── UserProfileCard/
-│       │       ├── UserProfileCard.view.tsx
+│       │       ├── UserProfileCard.view.tsx (with Tailwind classes)
 │       │       ├── UserProfileCard.tsx
-│       │       ├── UserProfileCard.module.css
 │       │       └── UserProfileCard.stories.tsx
 │       ├── api/
 │       ├── types/
@@ -94,12 +99,13 @@ src/
 │       └── screens/
 │           └── UserProfileScreen.tsx
 ├── shared/
-│   ├── ui/
+│   ├── ui/ (shadcn/ui components)
 │   ├── layout/
 │   ├── lib/
 │   └── config/
 ├── assets/
 ├── styles/
+│   └── globals.css
 └── instrumentation.ts
 ```
 
@@ -111,3 +117,4 @@ src/
 - **Warn** if presentational components contain state or side effects.
 - **Warn** if any folder/file does not follow the naming conventions above.
 - **Warn** if any domain folder is missing one of: `api/`, `types/`, `hooks/`, `services/`, `components/`, `screens/`.
+- **Warn** if CSS modules (`.module.css`) are used instead of Tailwind CSS.

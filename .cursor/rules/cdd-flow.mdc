@@ -22,9 +22,8 @@ Encourage building meaningful, reusable components first, then documenting them 
 Each component should follow this structure:
 ```
 features/{domain}/components/{ComponentName}/
-├── {ComponentName}.view.tsx      # Presentational component (required)
+├── {ComponentName}.view.tsx      # Presentational component with Tailwind CSS (required)
 ├── {ComponentName}.tsx           # Container with logic (only if needed)
-├── {ComponentName}.module.css    # Component styles (required)
 └── {ComponentName}.stories.tsx   # Storybook documentation (strongly recommended)
 ```
 
@@ -57,10 +56,16 @@ interface UserProfileCardProps {
 
 export function UserProfileCardView({ name, email, avatar }: UserProfileCardProps) {
   return (
-    <div className={styles.card}>
-      {avatar && <img src={avatar} alt={`${name}'s avatar`} />}
-      <h3>{name}</h3>
-      <p>{email}</p>
+    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+      {avatar && (
+        <img 
+          src={avatar} 
+          alt={`${name}'s avatar`} 
+          className="w-16 h-16 rounded-full mx-auto mb-4"
+        />
+      )}
+      <h3 className="text-xl font-semibold text-gray-900 text-center">{name}</h3>
+      <p className="text-gray-600 text-center mt-2">{email}</p>
     </div>
   );
 }
@@ -98,7 +103,7 @@ import { UserProfileCardView } from './UserProfileCard.view';
 export function UserProfileCard({ userId }: { userId: string }) {
   const { data: user } = useUser(userId);
   
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <div className="animate-pulse">Loading...</div>;
   
   return <UserProfileCardView {...user} />;
 }
@@ -111,13 +116,31 @@ import { UserProfileCard } from '../components/UserProfileCard/UserProfileCard';
 
 export function UserProfileScreen() {
   return (
-    <div>
+    <div className="container mx-auto px-4 py-8">
       <UserProfileCard userId="123" />
       {/* Other composed components */}
     </div>
   );
 }
 ```
+
+### Styling Guidelines
+
+#### ✅ Recommended
+- Use Tailwind CSS utility classes for all styling
+- Leverage shadcn/ui components for complex UI elements
+- Use Tailwind's design tokens for consistency
+- Implement responsive design with Tailwind's breakpoint prefixes
+
+#### ⚠️ Custom CSS Usage
+- Only use custom CSS when Tailwind utilities are insufficient
+- Place custom styles in `styles/globals.css` with proper organization
+- Use CSS variables for theme values that might change
+
+#### ❌ Avoid
+- CSS modules (`.module.css` files)
+- Inline styles for complex styling
+- Hardcoded colors, spacing, or typography values
 
 ### Guidelines (Not Strict Rules)
 
@@ -143,6 +166,7 @@ This CDD approach works alongside:
 - **Folder Structure Rules**: Components go in the designated `components/` folders
 - **Frontend Conventions**: Follow naming, coupling, and cohesion principles
 - **Testing**: Each component can be tested in isolation
+- **Styling**: Use Tailwind CSS for consistent, maintainable styles
 
 ### Benefits
 
@@ -151,6 +175,7 @@ This CDD approach works alongside:
 3. **Reusability**: Well-built components can be reused across features
 4. **Collaboration**: Team members can see and use existing components
 5. **Quality**: Building in isolation often leads to better component design
+6. **Consistency**: Tailwind CSS ensures consistent design across components
 
 ---
 
