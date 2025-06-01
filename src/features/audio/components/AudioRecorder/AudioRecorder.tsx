@@ -16,6 +16,7 @@ export function AudioRecorder({ config }: AudioRecorderProps) {
       audioLevel={recorder.audioLevel}
       isSupported={recorder.isSupported}
       error={recorder.error}
+      isInitializing={recorder.isInitializing}
       onStartRecording={recorder.startRecording}
       onStopRecording={recorder.stopRecording}
       onPauseRecording={recorder.pauseRecording}

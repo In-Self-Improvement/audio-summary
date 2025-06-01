@@ -38,6 +38,10 @@ const meta: Meta<typeof AudioRecorderView> = {
       control: "boolean",
       description: "브라우저 지원 여부",
     },
+    isInitializing: {
+      control: "boolean",
+      description: "초기화 중 여부",
+    },
     error: {
       control: "text",
       description: "에러 메시지",
@@ -55,11 +59,20 @@ export const Default: Story = {
     duration: 0,
     audioLevel: 0,
     isSupported: true,
+    isInitializing: false,
     error: null,
     onStartRecording: () => console.log("녹음 시작"),
     onStopRecording: () => console.log("녹음 중지"),
     onPauseRecording: () => console.log("녹음 일시정지"),
     onResumeRecording: () => console.log("녹음 재개"),
+  },
+};
+
+// 초기화 중 상태
+export const Initializing: Story = {
+  args: {
+    ...Default.args,
+    isInitializing: true,
   },
 };
 

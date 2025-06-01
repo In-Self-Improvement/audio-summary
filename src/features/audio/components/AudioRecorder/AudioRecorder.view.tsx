@@ -1,5 +1,5 @@
 import { RecordingStatus } from "@/features/audio/types/audioType";
-import { Mic, Square, Pause, Play, AlertCircle } from "lucide-react";
+import { Mic, Square, Pause, Play, AlertCircle, Loader2 } from "lucide-react";
 
 interface AudioRecorderViewProps {
   status: RecordingStatus;
@@ -11,6 +11,7 @@ interface AudioRecorderViewProps {
   onStopRecording: () => void;
   onPauseRecording: () => void;
   onResumeRecording: () => void;
+  isInitializing?: boolean;
 }
 
 export function AudioRecorderView({
@@ -23,6 +24,7 @@ export function AudioRecorderView({
   onStopRecording,
   onPauseRecording,
   onResumeRecording,
+  isInitializing = false,
 }: AudioRecorderViewProps) {
   // 시간 포맷팅 함수
   const formatDuration = (seconds: number): string => {
@@ -32,6 +34,20 @@ export function AudioRecorderView({
       .toString()
       .padStart(2, "0")}`;
   };
+
+  // 초기화 중일 때
+  if (isInitializing) {
+    return (
+      <div className="max-w-md mx-auto p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200/50 backdrop-blur-sm">
+        <div className="flex items-center justify-center text-blue-500 mb-4">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+        <div className="text-center text-gray-700 font-medium">
+          오디오 시스템을 확인하는 중...
+        </div>
+      </div>
+    );
+  }
 
   // 브라우저 지원하지 않는 경우
   if (!isSupported) {

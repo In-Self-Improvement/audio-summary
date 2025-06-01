@@ -10,12 +10,13 @@ const useAudioRecorder = (config: RecordingConfig = {}) => {
   const [state, setState] = useState<RecorderState>({
     status: "idle",
     duration: 0,
-    isSupported: audioService.isRecordingSupported(),
+    isSupported: false,
     error: null,
     audioLevel: 0,
   });
 
   const [recordings, setRecordings] = useState<AudioData[]>([]);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -23,6 +24,15 @@ const useAudioRecorder = (config: RecordingConfig = {}) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
+
+  // 클라이언트에서만 브라우저 지원 여부 확인
+  useEffect(() => {
+    setState((prev) => ({
+      ...prev,
+      isSupported: audioService.isRecordingSupported(),
+    }));
+    setIsInitializing(false);
+  }, []);
 
   // 실시간 오디오 레벨 업데이트
   const updateAudioLevel = useCallback(() => {
@@ -166,6 +176,7 @@ const useAudioRecorder = (config: RecordingConfig = {}) => {
     // 상태
     ...state,
     recordings,
+    isInitializing,
 
     // 액션
     startRecording,
