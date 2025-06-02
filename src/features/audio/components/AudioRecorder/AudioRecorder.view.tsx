@@ -1,5 +1,6 @@
 import { RecordingStatus } from "@/features/audio/types/audioType";
 import { Mic, Square, Pause, Play, AlertCircle, Loader2 } from "lucide-react";
+import { formatDuration } from "@/shared/lib/timeUtils";
 
 interface AudioRecorderViewProps {
   status: RecordingStatus;
@@ -26,15 +27,6 @@ export function AudioRecorderView({
   onResumeRecording,
   isInitializing = false,
 }: AudioRecorderViewProps) {
-  // 시간 포맷팅 함수
-  const formatDuration = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
   // 초기화 중일 때
   if (isInitializing) {
     return (
